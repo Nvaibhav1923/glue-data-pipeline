@@ -1,10 +1,62 @@
 version: 0.2
 
+run-as: root
+
+env:
+  shell: bash
+  variables:
+    S3_BUCKET: "github-glue-etl-script"
+    SCRIPT_PATH: "glue_jobs/my_etl_job.py"
+  git-credential-helper: yes
+
 phases:
-  build:
+  install:
+    run-as: root
+    on-failure: ABORT
+    runtime-versions:
+      python: 3.9
     commands:
-      - echo Current directory : "$(pwd)"
-      - echo Listing files :
-      - ls -R
-      - echo Deploying Glue script to S3...
-      - aws s3 cp glue_jobs/my_etl_job.py s3://github-glue-etl-script/glue_jobs/my_etl_job.py
+      - echo "Installing dependencies (if any)..."
+    finally:
+      - echo "Install phase completed."
+
+  pre_build:
+    run-as: root
+    on-failure: ABORT
+    commands:
+      - echo "Pre-build: verifying script presence"
+      - ls -l glue_jobs/
+    finally:
+      - echo "Pre-build phase completed."
+
+  build:
+    run-as: root
+    on-failure: ABORT
+    commands:
+      - echo "Uploading Glue script to S3..."
+      - aws s3 cp $SCRIPT_PATH s3://$S3_BUCKET/$SCRIPT_PATH
+    finally:
+      - echo "Build phase completed."
+
+  post_build:
+    run-as: root
+    on-failure: ABORT
+    commands:
+      - echo "Post-build cleanup (if required)..."
+    finally:
+      - echo "Post-build phase completed."
+
+artifacts:
+  files:
+    - glue_jobs/my_etl_job.py
+  name: uploaded-glue-script
+  discard-paths: no
+  base-directory: .
+
+cache:
+  key: glue-script-cache
+  fallback-keys:
+    - glue-script-fallback
+  action: restore
+  paths:
+    - glue_jobs/
