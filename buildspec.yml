@@ -6,7 +6,7 @@ phases:
       python: 3.9
   build:
     commands:
-      - echo "Current directory: $(pwd)"
+      - echo Current directory: $(pwd)
       - echo "Listing files:"
       - ls -R
       - echo "Deploying Glue script to S3..."
