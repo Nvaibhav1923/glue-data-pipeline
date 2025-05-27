@@ -7,7 +7,7 @@ phases:
   build:
     commands:
       - echo "Current directory: $(pwd)"
-      - echo "Contents:"
+      - echo "Listing files:"
       - ls -R
       - echo "Deploying Glue script to S3..."
       - aws s3 cp glue_jobs/my_etl_job.py s3://github-glue-etl-script/glue_jobs/my_etl_job.py
