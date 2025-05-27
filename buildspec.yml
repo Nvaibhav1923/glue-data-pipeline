@@ -3,7 +3,7 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo "Current directory: $(pwd)"
+      - echo "Current directory : $(pwd)"
       - echo "Listing files:"
       - ls -R
       - echo "Deploying Glue script to S3..."
